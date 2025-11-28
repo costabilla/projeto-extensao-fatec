@@ -22,8 +22,6 @@ O sistema foi pensado especialmente para quem costuma esquecer os horários ou p
 
 ## 🛠️ Tecnologias Utilizadas
 
-*(preencha aqui conforme for desenvolvendo)*
-
 * `Tecnologia 1`
 * `Tecnologia 2`
 * `Tecnologia 3`
