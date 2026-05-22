@@ -6,26 +6,73 @@ SET FOREIGN_KEY_CHECKS = 0;
 SET SQL_MODE = "NO_ENGINE_SUBSTITUTION";
 
 -- --------------------------------------------------------
--- Table structure for DoseEvent
+-- Limpeza das tabelas antigas (Garante execução limpa)
 -- --------------------------------------------------------
 DROP TABLE IF EXISTS `DoseEvent`;
-CREATE TABLE `DoseEvent` (
-    `id` VARCHAR(191) NOT NULL,
-    `scheduledFor` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `status` VARCHAR(191) NOT NULL DEFAULT 'pending',
-    `administeredAt` TIMESTAMP NULL DEFAULT NULL,
-    `prescriptionId` VARCHAR(191) NOT NULL,
-    `residentId` VARCHAR(191) NOT NULL,
-    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+DROP TABLE IF EXISTS `Prescription`;
+DROP TABLE IF EXISTS `Professional`;
+DROP TABLE IF EXISTS `Profile`;
+DROP TABLE IF EXISTS `Resident`;
+DROP TABLE IF EXISTS `User`;
+DROP TABLE IF EXISTS `_prisma_migrations`;
+
+-- --------------------------------------------------------
+-- Tabela: User (Usuário)
+-- --------------------------------------------------------
+CREATE TABLE `User` (
+    `id_usuario` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NOT NULL,
+    `role` VARCHAR(191) NOT NULL DEFAULT 'USER',
+    PRIMARY KEY (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
--- Table structure for Prescription
+-- Tabela: Resident (Residente)
 -- --------------------------------------------------------
-DROP TABLE IF EXISTS `Prescription`;
+CREATE TABLE `Resident` (
+    `id_residente` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `room` VARCHAR(191) NOT NULL,
+    `bed` VARCHAR(191) DEFAULT NULL,
+    `photo` VARCHAR(191) DEFAULT NULL,
+    `active` TINYINT(1) NOT NULL DEFAULT 1,
+    PRIMARY KEY (`id_residente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Tabela: Profile (Perfil do Usuário)
+-- --------------------------------------------------------
+CREATE TABLE `Profile` (
+    `id_perfil` VARCHAR(191) NOT NULL,
+    `initials` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `avatarCls` VARCHAR(191) DEFAULT NULL,
+    `id_usuario` VARCHAR(191) NOT NULL,
+    PRIMARY KEY (`id_perfil`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Tabela: Professional (Profissional de Saúde)
+-- --------------------------------------------------------
+CREATE TABLE `Professional` (
+    `id_profissional` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `role` VARCHAR(191) NOT NULL,
+    `initials` VARCHAR(191) NOT NULL,
+    `registry` VARCHAR(191) DEFAULT NULL,
+    `email` VARCHAR(191) DEFAULT NULL,
+    `phone` VARCHAR(191) DEFAULT NULL,
+    `bio` TEXT DEFAULT NULL,
+    `active` TINYINT(1) NOT NULL DEFAULT 1,
+    PRIMARY KEY (`id_profissional`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Tabela: Prescription (Prescrição / Receita)
+-- --------------------------------------------------------
 CREATE TABLE `Prescription` (
-    `id` VARCHAR(191) NOT NULL,
+    `id_prescricao` VARCHAR(191) NOT NULL,
     `drug` TEXT NOT NULL,
     `drugIcon` VARCHAR(191) NOT NULL DEFAULT 'pill',
     `dose` TEXT NOT NULL,
@@ -35,108 +82,43 @@ CREATE TABLE `Prescription` (
     `notes` TEXT DEFAULT NULL,
     `startDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `endDate` TIMESTAMP NULL DEFAULT NULL,
-    `residentId` VARCHAR(191) NOT NULL,
-    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+    `id_residente` VARCHAR(191) NOT NULL,
+    PRIMARY KEY (`id_prescricao`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
--- Table structure for Professional
+-- Tabela: DoseEvent (Evento de Dosagem / Agenda)
 -- --------------------------------------------------------
-DROP TABLE IF EXISTS `Professional`;
-CREATE TABLE `Professional` (
-    `id` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
-    `role` VARCHAR(191) NOT NULL,
-    `initials` VARCHAR(191) NOT NULL,
-    `registry` VARCHAR(191) DEFAULT NULL,
-    `email` VARCHAR(191) DEFAULT NULL,
-    `phone` VARCHAR(191) DEFAULT NULL,
-    `bio` TEXT DEFAULT NULL,
-    `active` TINYINT(1) NOT NULL DEFAULT 1,
-    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+CREATE TABLE `DoseEvent` (
+    `id_evento` VARCHAR(191) NOT NULL,
+    `scheduledFor` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `status` VARCHAR(191) NOT NULL DEFAULT 'pending',
+    `administeredAt` TIMESTAMP NULL DEFAULT NULL,
+    `id_prescricao` VARCHAR(191) NOT NULL,
+    `id_residente` VARCHAR(191) NOT NULL,
+    PRIMARY KEY (`id_evento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
--- Table structure for Profile
+-- Índices Otimizados
 -- --------------------------------------------------------
-DROP TABLE IF EXISTS `Profile`;
-CREATE TABLE `Profile` (
-    `id` VARCHAR(191) NOT NULL,
-    `initials` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
-    `avatarCls` VARCHAR(191) DEFAULT NULL,
-    `userId` VARCHAR(191) NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
--- Table structure for Resident
--- --------------------------------------------------------
-DROP TABLE IF EXISTS `Resident`;
-CREATE TABLE `Resident` (
-    `id` VARCHAR(191) NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
-    `room` VARCHAR(191) NOT NULL,
-    `bed` VARCHAR(191) DEFAULT NULL,
-    `photo` VARCHAR(191) DEFAULT NULL,
-    `active` TINYINT(1) NOT NULL DEFAULT 1,
-    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
--- Table structure for User
--- --------------------------------------------------------
-DROP TABLE IF EXISTS `User`;
-CREATE TABLE `User` (
-    `id` VARCHAR(191) NOT NULL,
-    `email` VARCHAR(191) NOT NULL,
-    `password` VARCHAR(191) NOT NULL,
-    `role` VARCHAR(191) NOT NULL DEFAULT 'USER',
-    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
--- Table structure for _prisma_migrations
--- --------------------------------------------------------
-DROP TABLE IF EXISTS `_prisma_migrations`;
-CREATE TABLE `_prisma_migrations` (
-    `id` VARCHAR(36) NOT NULL,
-    `checksum` VARCHAR(64) NOT NULL,
-    `finished_at` TIMESTAMP NULL DEFAULT NULL,
-    `migration_name` VARCHAR(255) NOT NULL,
-    `logs` TEXT DEFAULT NULL,
-    `rolled_back_at` TIMESTAMP NULL DEFAULT NULL,
-    `started_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `applied_steps` INT UNSIGNED NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
--- Indexes and Constraints
--- --------------------------------------------------------
-
-CREATE INDEX `DoseEvent_prescriptionId_idx` ON `DoseEvent` (`prescriptionId`);
-CREATE INDEX `DoseEvent_residentId_idx` ON `DoseEvent` (`residentId`);
-CREATE INDEX `DoseEvent_scheduledFor_idx` ON `DoseEvent` (`scheduledFor`);
-CREATE UNIQUE INDEX `Profile_userId_key` ON `Profile` (`userId`);
 CREATE UNIQUE INDEX `User_email_key` ON `User` (`email`);
+CREATE UNIQUE INDEX `Profile_id_usuario_key` ON `Profile` (`id_usuario`);
+CREATE INDEX `DoseEvent_id_prescricao_idx` ON `DoseEvent` (`id_prescricao`);
+CREATE INDEX `DoseEvent_id_residente_idx` ON `DoseEvent` (`id_residente`);
+CREATE INDEX `DoseEvent_scheduledFor_idx` ON `DoseEvent` (`scheduledFor`);
 
-ALTER TABLE `DoseEvent`
-    ADD CONSTRAINT `DoseEvent_prescriptionId_fkey` FOREIGN KEY (`prescriptionId`) REFERENCES `Prescription` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    ADD CONSTRAINT `DoseEvent_residentId_fkey` FOREIGN KEY (`residentId`) REFERENCES `Resident` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+-- --------------------------------------------------------
+-- Restrições de Chaves Estrangeiras (Constraints)
+-- --------------------------------------------------------
+ALTER TABLE `Profile`
+    ADD CONSTRAINT `Profile_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `User` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `Prescription`
-    ADD CONSTRAINT `Prescription_residentId_fkey` FOREIGN KEY (`residentId`) REFERENCES `Resident` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+    ADD CONSTRAINT `Prescription_id_residente_fkey` FOREIGN KEY (`id_residente`) REFERENCES `Resident` (`id_residente`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE `Profile`
-    ADD CONSTRAINT `Profile_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `DoseEvent`
+    ADD CONSTRAINT `DoseEvent_id_prescricao_fkey` FOREIGN KEY (`id_prescricao`) REFERENCES `Prescription` (`id_prescricao`) ON DELETE CASCADE ON UPDATE CASCADE,
+    ADD CONSTRAINT `DoseEvent_id_residente_fkey` FOREIGN KEY (`id_residente`) REFERENCES `Resident` (`id_residente`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 SET FOREIGN_KEY_CHECKS = 1;
